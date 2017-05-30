@@ -7,6 +7,8 @@ from os import path
 # find all directories
 from os import listdir
 
+import random
+
 #########
 ## Get list of Dirs and images
 #########
@@ -31,11 +33,6 @@ for x in objDirs:
             row.append('images/'+ x + '/' + y)
     imgList.append(row)
 
-cnt =0
-for i in imgList:
-    print("List {}".format(imgList[cnt]))
-    cnt +=1
-
 #########
 ## Get any saved scores
 #########
@@ -43,13 +40,13 @@ saveFilePath = 'saved.txt'
 # cached scores
 scores = {}
 
-
 if path.isfile(saveFilePath)== False or path.getsize(saveFilePath)==0:
     print("no save file found generating new one")
     f = open(saveFilePath, 'w')
     tmpVals = ""
     for i in objDirs:
         tmpVals += str(i + "\n" + "0" + "\n")
+    tmpVals += str("NumOfTests" + "\n" + "0" + "\n")
     f.write(tmpVals)
     f.close()
 
@@ -89,8 +86,6 @@ cnt = 0
 for i in imgList:
     imgSize.append(len(imgList[cnt]))
     cnt+=1
-print("this is the imgSize: {}".format(imgSize))
-
 
 cv2.namedWindow("main", cv2.WINDOW_AUTOSIZE)
 while(True):
@@ -125,20 +120,21 @@ while(True):
 
     elif k == 13:
         ## show the answer
-        print("the answer is..: {}".format(objDirs[dirCnt]))
+        print("the answer is..: {} \nPress yes if you got the answer right".format(objDirs[dirCnt]))
         nameReveal = np.zeros((500,500,3), np.uint8)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(nameReveal,objDirs[dirCnt],(2,250), font, 4,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(nameReveal,objDirs[dirCnt],(2,150), font, 3,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(nameReveal,"Press 'y' if you got it right",(2,400), font, 1,(0,255,255),2,cv2.LINE_AA)
+        cv2.putText(nameReveal,"or any other to continue",(2,450), font, 1,(0,255,255),2,cv2.LINE_AA)
+        
         cv2.imshow("main", nameReveal) 
         k = cv2.waitKey(0)
 
         # if 'y' is pressed(answered correctly) increment point for object
         if k == 121: 
             tmp = int(scores[objDirs[dirCnt]])+1
-            print("This is tmp: {}".format(tmp))
             scores[objDirs[dirCnt]]= tmp
 
-            print("your score stands at: {}".format(scores))
         if dirCnt+1 < dirSize:
             dirCnt+=1
         else: 
